@@ -1,0 +1,148 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+`
+<div class="row">
+    <div class="card">
+        <div class="card-header">
+            <h3> MS02</h3>
+        </div>
+        <div class="card-body">
+
+            <div class="col-12">
+                <table class="table table-bordered table-responsive-sm">
+                    <thead class="bg-success text-center">
+                        <tr>
+
+                            <th>Lokasi</th>
+                            <th>Waktu</th>
+                            <th>Controller</th>
+                            <th>Mac</th>
+                            <th>Ip</th>
+                            <th>Suhu Input</th>
+                            <th>Suhu Output</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center">
+                        @foreach (var ms02 in ViewBag.item02)
+                        {
+                            <tr>
+
+                                <td>@ms02.lokasi</td>
+                                <td>@ms02.waktu</td>
+                                <td>@ms02.controller</td>
+                                <td>@ms02.mac</td>
+                                <td>@ms02.ip</td>
+                                <td>@ms02.sensorsuhu_in</td>
+                                <td>@ms02.sensorsuhu_out</td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="card">
+        <div class="card-header">
+            <h3> MS04</h3>
+        </div>
+        <div class="card-body">
+
+            <div class="col-12">
+                <table class="table table-bordered table-responsive-sm">
+                    <thead class="bg-success text-center">
+                        <tr>
+
+                            <th>Lokasi</th>
+                            <th>Waktu</th>
+                            <th>Controller</th>
+                            <th>Mac</th>
+                            <th>Ip</th>
+                            <th>Suhu Input</th>
+                            <th>Suhu Output</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-center">
+                        @foreach (var ms04 in ViewBag.item04)
+                        {
+                            <tr>
+
+                                <td>@ms04.lokasi</td>
+                                <td>@ms04.waktu</td>
+                                <td>@ms04.controller</td>
+                                <td>@ms04.mac</td>
+                                <td>@ms04.ip</td>
+                                <td>@ms04.sensorsuhu_in</td>
+                                <td>@ms04.sensorsuhu_out</td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="table-responsive">
+    <div id="chartContainer" style="height: 200px;"></div>
+
+
+
+
+</div>
+@*//<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>*@
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+
+        var dataPoints = [];
+        var chart = new CanvasJS.Chart("chartContainer", {
+            animationEnabled: true,
+            theme: "light2",
+            title: {
+                text: "Suhu input"
+            },
+            data: [{
+                type: "line",
+                xValueType: "dateTime",
+                xValueFormatString: "DD-MM-YYYY HH:mm:ss",
+                showInLegend: true,
+                dataPoints: dataPoints,
+            }
+            ]
+        });
+        $(function () {
+            chart.render();
+
+            setTimeout(getData, 1000);
+        });
+        function getData() {
+            $.ajax({
+                url: "data/GetRealTimeData",
+                dataType: 'JSON',
+                success: function (d) {
+                    $.each(d, function (idx, dt) {
+                        var timeStamp = new Date(dt.waktu);
+                        var time = { v: timeStamp, f: moment(timeStamp).format('D-M-Y HH:mm:ss') };
+                        var val = dt.suhu;
+                        dataPoints.push({label:time, y: val });
+                    })
+                    chart.options.data[0].dataPoints = dataPoints;
+                    chart.render();
+                    setTimeout(getData, 1000);
+                }
+            })
+        }
+
+    });
+</script>
